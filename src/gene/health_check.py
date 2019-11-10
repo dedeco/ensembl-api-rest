@@ -16,4 +16,4 @@ def application_data():
 health.add_check(api_available)
 health.add_section("application", application_data)
 
-gene_blueprint.add_url_rule("/healthcheck", "healthcheck", view_func=lambda: health.run())
+gene_blueprint.add_url_rule("/health_check", "health_check", view_func=lambda: health.run())
