@@ -87,6 +87,9 @@ venv.bak/
 #Custom
 /web/tmp/*
 instance/app.db
+instance/test.db
 
 #IDE
 .idea/
+
+

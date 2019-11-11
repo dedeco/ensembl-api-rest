@@ -3,7 +3,7 @@ import unittest
 from src.gene.models import Gene
 
 
-class GeneCase(unittest.TestCase):
+class GeneModelCase(unittest.TestCase):
     def setUp(self):
         new_gene = Gene("id",
                         "species 1",
@@ -17,7 +17,6 @@ class GeneCase(unittest.TestCase):
         self.assertIsInstance(self.test_gene, Gene)
 
     def test_new_gene(self):
-
         self.assertTrue(self.test_gene.stable_id == "id")
         self.assertTrue(self.test_gene.species == "species 1")
         self.assertTrue(self.test_gene.display_label == "name 1")

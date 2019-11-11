@@ -10,9 +10,9 @@ class Gene(db.Model):
     location = db.Column(db.String(60))
     db = db.Column(db.String(32), default="core", nullable=False)
 
-    def __init__(self, stable_id, species, display_label, location, db_):
+    def __init__(self, stable_id, species, display_label, location, db=None):
         self.stable_id = stable_id
         self.species = species
         self.display_label = display_label
         self.location = location
-        self.db = db_
+        self.db = db
