@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from flask_restful import Api, Resource, abort
+from flask_restful import Api, Resource
 
 from src import db
 from src.gene.models import Gene

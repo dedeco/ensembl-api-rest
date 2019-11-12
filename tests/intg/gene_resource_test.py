@@ -1,13 +1,10 @@
+import unittest
 from http import HTTPStatus
 
-import pytest
-import unittest
-
-from flask import url_for, json
+from flask import url_for
 
 from src import create_app, db
 from src.gene.models import Gene
-from tests.utils import ordered
 
 
 class GeneResourceCase(unittest.TestCase):

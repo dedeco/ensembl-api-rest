@@ -1,6 +1,6 @@
 import pytest
 
-from src import create_app, db
+from src import create_app
 from src.gene.models import Gene
 
 
