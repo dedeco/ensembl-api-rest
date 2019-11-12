@@ -42,7 +42,7 @@ class GeneResourceCase(unittest.TestCase):
         }
 
     def test_response_ok(self):
-        res = self.app.test_client().get(url_for('gene.genesresource'))
+        res = self.app.test_client().get(url_for('genes.genesresource'))
         self.assertEqual(HTTPStatus.OK, res.status_code)
 
     def test_response_some_gene_data(self):
@@ -53,7 +53,7 @@ class GeneResourceCase(unittest.TestCase):
                         item['location'])
             self.db.session.add(gene)
         self.db.session.commit()
-        res = self.app.test_client().get(url_for('gene.genesresource'))
+        res = self.app.test_client().get(url_for('genes.genesresource'))
         self.maxDiff = None
         self.assertEqual(sorted(res.json['results'], key=lambda k: k['ensembl_stable_id'])
                          , sorted(self.data['results'], key=lambda k: k['ensembl_stable_id']))

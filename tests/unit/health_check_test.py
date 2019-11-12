@@ -10,7 +10,7 @@ from flask import url_for
 class HealthCheckCase(unittest.TestCase):
 
     def setUp(self):
-        self.response = self.client.get(url_for('gene.health_check'))
+        self.response = self.client.get(url_for('genes.health_check'))
 
     def test_response_ok(self):
         self.assertEqual(HTTPStatus.OK, self.response.status_code)
