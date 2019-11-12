@@ -23,26 +23,26 @@ class GeneResourceCase(unittest.TestCase):
                 {
                     "species": "acanthochromis_polyacanthus",
                     "ensembl_stable_id": "ENSAPOG00000019081",
-                    "gene_name": "tbpl2",
+                    "gene_name": "tbpl2 abc",
                     "location": "MVNR01000308.1:147400-150913"
                 },
                 {
                     "species": "acanthochromis_polyacanthus",
                     "ensembl_stable_id": "ENSAPOG00000024458",
-                    "gene_name": "tbr1b",
+                    "gene_name": "tbr1b abc",
                     "location": "MVNR01000044.1:444385-449064"
                 },
                 {
                     "species": "acanthochromis_polyacanthus",
                     "ensembl_stable_id": "ENSAPOG00000017352",
-                    "gene_name": "tbrg1",
+                    "gene_name": "tbrg1 abc",
                     "location": "MVNR01000378.1:502653-510844"
                 }
             ]
         }
 
     def test_response_ok(self):
-        res = self.app.test_client().get(url_for('genes.genesresource'))
+        res = self.app.test_client().get(url_for('genes.genesresource', lookup='xpz'))
         self.assertEqual(HTTPStatus.OK, res.status_code)
 
     def test_response_some_gene_data(self):
@@ -53,7 +53,7 @@ class GeneResourceCase(unittest.TestCase):
                         item['location'])
             self.db.session.add(gene)
         self.db.session.commit()
-        res = self.app.test_client().get(url_for('genes.genesresource'))
+        res = self.app.test_client().get(url_for('genes.genesresource', lookup='abc'))
         self.maxDiff = None
         self.assertEqual(sorted(res.json['results'], key=lambda k: k['ensembl_stable_id'])
                          , sorted(self.data['results'], key=lambda k: k['ensembl_stable_id']))
