@@ -64,7 +64,7 @@ class GeneResourceCase(unittest.TestCase):
 
     def test_search_by_gene_name(self):
         KEYWORD = 'xyz'
-        res = self.app.test_client().get(url_for('genes.genesresource', lookup=KEYWORD))
+        res = self._get_genes(KEYWORD)
         expected = [gene for gene in self.data.get('results') if KEYWORD.casefold() in gene.get('gene_name').casefold()]
         self.assertEqual(_sort(expected), _sort(res.json.get('results')))
 
@@ -78,8 +78,16 @@ class GeneResourceCase(unittest.TestCase):
             if GENE_KEYWORD.casefold() in gene.get('gene_name').casefold() and \
                     SPECIES_KEYWORD.casefold() in gene.get('species').casefold():
                 expected.append(gene)
-
         self.assertEqual(_sort(expected), _sort(res.json.get('results')))
+
+    def test_search_by_gene_name_less_three_chars(self):
+        KEYWORD = 'x'
+        res = self.app.test_client().get(url_for('genes.genesresource', lookup=KEYWORD))
+        expected = [gene for gene in self.data.get('results') if KEYWORD.casefold() in gene.get('gene_name').casefold()]
+        self.assertEqual(_sort(expected), _sort(res.json.get('results')))
+
+    def _get_genes(self, gene_name_lookup):
+        return self.app.test_client().get(url_for('genes.genesresource', lookup=gene_name_lookup))
 
     def _helper_add_genes(self):
         for item in self.data.get('results'):
