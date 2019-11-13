@@ -15,7 +15,7 @@ def _sort(data):
         return []
 
 
-class GeneResourceCase(unittest.TestCase):
+class GeneScenariosSearchCase(unittest.TestCase):
 
     def setUp(self):
         self.db = db

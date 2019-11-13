@@ -41,11 +41,11 @@ class GeneResourceCase(unittest.TestCase):
             ]
         }
 
-    def test_response_ok(self):
+    def test_request_get_should_response_ok(self):
         res = self.app.test_client().get(url_for('genes.genesresource', lookup='xpz'))
         self.assertEqual(HTTPStatus.OK, res.status_code)
 
-    def test_response_some_gene_data(self):
+    def test_request_get_should_response_some_gene_data(self):
         for item in self.data['results']:
             gene = Gene(item['ensembl_stable_id'],
                         item['species'],
@@ -57,6 +57,18 @@ class GeneResourceCase(unittest.TestCase):
         self.maxDiff = None
         self.assertEqual(sorted(res.json['results'], key=lambda k: k['ensembl_stable_id'])
                          , sorted(self.data['results'], key=lambda k: k['ensembl_stable_id']))
+
+    def test_request_post_should_returns_not_allowed(self):
+        res = self.app.test_client().post(url_for('genes.genesresource'))
+        self.assertEqual(HTTPStatus.METHOD_NOT_ALLOWED, res.status_code)
+
+    def test_request_patch_should_returns_not_allowed(self):
+        res = self.app.test_client().patch(url_for('genes.genesresource'))
+        self.assertEqual(HTTPStatus.METHOD_NOT_ALLOWED, res.status_code)
+
+    def test_request_put_should_returns_not_allowed(self):
+        res = self.app.test_client().put(url_for('genes.genesresource'))
+        self.assertEqual(HTTPStatus.METHOD_NOT_ALLOWED, res.status_code)
 
     def tearDown(self):
         with self.app.app_context():
