@@ -62,6 +62,10 @@ class GeneResourceCase(unittest.TestCase):
         }
         self._helper_add_genes()
 
+    def test_search_missing_parameters(self):
+        res = self.app.test_client().get(url_for('genes.genesresource'))
+        self.assertEqual(HTTPStatus.BAD_REQUEST, res.status_code)
+
     def test_search_by_gene_name(self):
         KEYWORD = 'xyz'
         res = self._get_genes(KEYWORD)
@@ -83,15 +87,19 @@ class GeneResourceCase(unittest.TestCase):
     def test_search_by_gene_name_less_three_chars(self):
         KEYWORD = 'x'
         res = self.app.test_client().get(url_for('genes.genesresource', lookup=KEYWORD))
-        expected = [gene for gene in self.data.get('results') if KEYWORD.casefold() in gene.get('gene_name').casefold()]
-        self.assertEqual(_sort(expected), _sort(res.json.get('results')))
+        self.assertEqual(HTTPStatus.BAD_REQUEST, res.status_code)
+
+    def test_search_by_gene_name_and_species_less_three_chars(self):
+        GENE_KEYWORD = 'z'
+        SPECIES_KEYWORD = 'g'
+        res = self.app.test_client().get(url_for('genes.genesresource', lookup=GENE_KEYWORD, species=SPECIES_KEYWORD))
+        self.assertEqual(HTTPStatus.BAD_REQUEST, res.status_code)
 
     def _get_genes(self, gene_name_lookup):
         return self.app.test_client().get(url_for('genes.genesresource', lookup=gene_name_lookup))
 
     def _helper_add_genes(self):
         for item in self.data.get('results'):
-            # print('inserting genge{0}'.format(item['ensembl_stable_id']))
             gene = Gene(item['ensembl_stable_id'],
                         item['species'],
                         item['gene_name'],
