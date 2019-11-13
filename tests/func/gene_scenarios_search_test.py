@@ -95,6 +95,12 @@ class GeneResourceCase(unittest.TestCase):
         res = self.app.test_client().get(url_for('genes.genesresource', lookup=GENE_KEYWORD, species=SPECIES_KEYWORD))
         self.assertEqual(HTTPStatus.BAD_REQUEST, res.status_code)
 
+    def test_search_by_gene_name_using_special_chars(self):
+        KEYWORD = 'ß€⨭'
+        res = self._get_genes(KEYWORD)
+        expected = [gene for gene in self.data.get('results') if KEYWORD.casefold() in gene.get('gene_name').casefold()]
+        self.assertEqual(_sort(expected), _sort(res.json.get('results')))
+
     def _get_genes(self, gene_name_lookup):
         return self.app.test_client().get(url_for('genes.genesresource', lookup=gene_name_lookup))
 
