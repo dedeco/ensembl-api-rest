@@ -41,25 +41,44 @@ class GeneResourceCase(unittest.TestCase):
                     "location": "MVNR22222222.2:222222-222222"
                 },
                 {
-                    "species": "def ghij",
+                    "species": "def xyz",
                     "ensembl_stable_id": "ENSAP3333333333333",
                     "gene_name": "gene zzz",
                     "location": "MVNR3333333.3:333333-333333"
                 },
                 {
-                    "species": "def ghij",
+                    "species": "def ghi",
                     "ensembl_stable_id": "ENSAP4444444444444",
                     "gene_name": "gene zzzxyz",
                     "location": "MVNR4444444.4:444444-444444"
+                },
+                {
+                    "species": "def GHI",
+                    "ensembl_stable_id": "ENSAP5555555555555",
+                    "gene_name": "gene ZZZ",
+                    "location": "MVNR5555555.5:555555-555555"
                 }
             ]
         }
-
-    def test_search_by_name(self):
         self._helper_add_genes()
-        partial_word = 'xyz'
-        res = self.app.test_client().get(url_for('genes.genesresource',lookup=partial_word))
-        expected = [gene for gene in self.data.get('results') if partial_word in gene['gene_name']]
+
+    def test_search_by_gene_name(self):
+        KEYWORD = 'xyz'
+        res = self.app.test_client().get(url_for('genes.genesresource', lookup=KEYWORD))
+        expected = [gene for gene in self.data.get('results') if KEYWORD.casefold() in gene.get('gene_name').casefold()]
+        self.assertEqual(_sort(expected), _sort(res.json.get('results')))
+
+    def test_search_by_gene_name_and_species(self):
+        GENE_KEYWORD = 'zzz'
+        SPECIES_KEYWORD = 'ghi'
+        res = self.app.test_client().get(url_for('genes.genesresource', lookup=GENE_KEYWORD, species=SPECIES_KEYWORD))
+
+        expected = []
+        for gene in self.data.get('results'):
+            if GENE_KEYWORD.casefold() in gene.get('gene_name').casefold() and \
+                    SPECIES_KEYWORD.casefold() in gene.get('species').casefold():
+                expected.append(gene)
+
         self.assertEqual(_sort(expected), _sort(res.json.get('results')))
 
     def _helper_add_genes(self):

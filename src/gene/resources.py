@@ -17,18 +17,25 @@ class GenesResource(Resource):
     def get(self):
         parser.add_argument('lookup',
                             required=True,
-                            help='The partial query for gene name typed by the user, e.g. brc')
+                            help='The partial query for gene name typed by the user, e.g. brc.')
+
+        parser.add_argument('species',
+                            help='The name of the target species, e.g. homo_sapiens.')
+
         args = parser.parse_args()
 
-        all_genes = db.session.query(Gene)\
-            .filter(Gene.display_label.
-                    ilike('%{0}%'.format(args['lookup'])))\
-            .all()
+        q = db.session.query(Gene) \
+            .filter(Gene.display_label.ilike('%{0}%'.format(args.get('lookup'))))
+
+        if args.get('species'):
+            q += q.filter(Gene.species.ilike('%{0}%'.format(args.get('species'))))
+
+        genes = q.all()
 
         schema = GeneSchema(many=True)
-        
+
         return {"results": schema.dump(
-            all_genes
+            genes
         )}, HTTPStatus.OK
 
 
