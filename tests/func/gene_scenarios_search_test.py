@@ -1,6 +1,6 @@
-import re
 import unittest
 from http import HTTPStatus
+from urllib.parse import urlparse
 
 from flask import url_for
 
@@ -13,6 +13,13 @@ def _sort(data):
         return sorted(data, key=lambda k: k['ensembl_stable_id'])
     else:
         return []
+
+
+def _get_parameters_from_some_url(next_):
+    o = urlparse(next_)
+    params = {q.split('=')[0]: int(q.split('=')[1]) for q in o.query.split('&') \
+              if 'start' in q or 'limit' in q}
+    return params
 
 
 class GeneScenariosSearchCase(unittest.TestCase):
@@ -57,6 +64,12 @@ class GeneScenariosSearchCase(unittest.TestCase):
                     "ensembl_stable_id": "ENSAP5555555555555",
                     "gene_name": "gene ZZZ",
                     "location": "MVNR5555555.5:555555-555555"
+                },
+                {
+                    "species": "def ghi jlm",
+                    "ensembl_stable_id": "ENSAP6666666666666",
+                    "gene_name": "gene WWW",
+                    "location": "MVNR6666666.6:666666-666666"
                 }
             ]
         }
@@ -106,6 +119,67 @@ class GeneScenariosSearchCase(unittest.TestCase):
         res = self._get_genes(KEYWORD)
         expected = [gene for gene in self.data.get('results') if KEYWORD.casefold() in gene.get('gene_name').casefold()]
         self.assertEqual(_sort(expected), _sort(res.json.get('results')))
+
+    def test_search_by_gene_name_with_limit_pagination(self):
+        KEYWORD = 'gene'
+        LIMIT = 3
+        res = self.app.test_client().get(url_for('genes.genesresource', lookup=KEYWORD, limit=LIMIT))
+        expected = [gene for gene in self.data.get('results') if KEYWORD.casefold() in gene.get('gene_name').casefold()]
+        self.assertEqual(_sort(expected[:LIMIT]), _sort(res.json.get('results')))
+        self.assertEqual(LIMIT, len(res.json.get('results')))
+
+    def test_search_by_gene_name_with_limit_and_start_pagination(self):
+        KEYWORD = 'gene'
+        LIMIT = 3
+        START = 3
+        res = self._get_genes_limit_and_start(KEYWORD, LIMIT, START)
+        expected = [gene for gene in self.data.get('results') if KEYWORD.casefold() in gene.get('gene_name').casefold()]
+        self.assertEqual(_sort(expected[max(START - 1, 0):min((START + LIMIT) - 1, len(expected) - 1)]),
+                         _sort(res.json.get('results')))
+        self.assertEqual(LIMIT, len(res.json.get('results')))
+
+    def test_search_by_gene_name_next_link(self):
+        KEYWORD = 'gene'
+        LIMIT = 3
+        START = 1
+
+        res = self._get_genes_limit_and_start(KEYWORD, LIMIT, START)
+
+        expected = [gene for gene in self.data.get('results') if KEYWORD.casefold() in gene.get('gene_name').casefold()]
+        self.assertEqual(_sort(expected[max(START - 1, 0):min((START + LIMIT) - 1, len(expected))]),
+                         _sort(res.json.get('results')))
+        self.assertEqual(LIMIT, len(res.json.get('results')))
+
+        params = _get_parameters_from_some_url(res.json.get('next'))
+
+        res = self.app.test_client().get(res.json.get('next'))
+
+        self.assertEqual(_sort(
+            expected[max(params['start'] - 1, 0): min((params['start'] + params['limit']) - 1, len(expected))]),
+                         _sort(res.json.get('results')))
+
+    def test_search_by_gene_name_previous_link(self):
+        KEYWORD = 'gene'
+        LIMIT = 3
+        START = 3
+
+        res = self._get_genes_limit_and_start(KEYWORD, LIMIT, START)
+
+        expected = [gene for gene in self.data.get('results') if KEYWORD.casefold() in gene.get('gene_name').casefold()]
+        self.assertEqual(_sort(expected[max(START - 1, 0):min((START + LIMIT) - 1, len(expected))]),
+                         _sort(res.json.get('results')))
+        self.assertEqual(LIMIT, len(res.json.get('results')))
+
+        params = _get_parameters_from_some_url(res.json.get('previous'))
+
+        res = self.app.test_client().get(res.json.get('previous'))
+
+        self.assertEqual(_sort(
+            expected[max(params['start'] - 1, 0): min((params['start'] + params['limit']) - 1, len(expected))]),
+                         _sort(res.json.get('results')))
+
+    def _get_genes_limit_and_start(self, keyword, limit, start):
+        return self.app.test_client().get(url_for('genes.genesresource', lookup=keyword, start=start, limit=limit))
 
     def _get_genes(self, gene_name_lookup):
         return self.app.test_client().get(url_for('genes.genesresource', lookup=gene_name_lookup))

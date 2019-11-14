@@ -42,7 +42,7 @@ class GeneResourceCase(unittest.TestCase):
         }
 
     def test_request_get_should_response_ok(self):
-        res = self.app.test_client().get(url_for('genes.genesresource', lookup='xpz'))
+        res = self.app.test_client().get(url_for('genes.genesresource', lookup='abc'))
         self.assertEqual(HTTPStatus.OK, res.status_code)
 
     def test_request_get_should_response_some_gene_data(self):
