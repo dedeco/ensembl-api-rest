@@ -1,5 +1,6 @@
 import unittest
 from http import HTTPStatus
+from time import sleep
 from urllib.parse import urlparse
 
 from flask import url_for
@@ -73,7 +74,7 @@ class GeneScenariosSearchCase(unittest.TestCase):
                 }
             ]
         }
-        self._helper_add_genes()
+        self._helper_add_genes(self.data)
 
     def test_search_missing_parameters(self):
         res = self.app.test_client().get(url_for('genes.genesresource'))
@@ -156,7 +157,7 @@ class GeneScenariosSearchCase(unittest.TestCase):
 
         self.assertEqual(_sort(
             expected[max(params['start'] - 1, 0): min((params['start'] + params['limit']) - 1, len(expected))]),
-                         _sort(res.json.get('results')))
+            _sort(res.json.get('results')))
 
     def test_search_by_gene_name_previous_link(self):
         KEYWORD = 'gene'
@@ -176,7 +177,44 @@ class GeneScenariosSearchCase(unittest.TestCase):
 
         self.assertEqual(_sort(
             expected[max(params['start'] - 1, 0): min((params['start'] + params['limit']) - 1, len(expected))]),
-                         _sort(res.json.get('results')))
+            _sort(res.json.get('results')))
+
+    def test_search_by_gene_name_with_cache_should_return_same_result(self):
+        KEYWORD = 'gene'
+        LIMIT = 10
+
+        before_caching = self.app.test_client().get(url_for('genes.genesresource', lookup=KEYWORD, limit=LIMIT))
+        self.add_more_gene()
+        after_caching = self.app.test_client().get(url_for('genes.genesresource', lookup=KEYWORD, limit=LIMIT))
+
+        self.assertEqual(_sort(before_caching.json.get('results')), _sort(after_caching.json.get('results')))
+
+    def test_search_by_gene_name_with_after_timeout_cache_return_different_result(self):
+        KEYWORD = 'gene'
+        LIMIT = 10
+
+        before_caching = self.app.test_client().get(url_for('genes.genesresource', lookup=KEYWORD, limit=LIMIT))
+        self.add_more_gene()
+
+        sleep(2) # config test is 1 second
+
+        after_caching = self.app.test_client().get(url_for('genes.genesresource', lookup=KEYWORD, limit=LIMIT))
+
+        self.assertNotEqual(_sort(before_caching.json.get('results')), _sort(after_caching.json.get('results')))
+        self.assertEqual(len(before_caching.json.get('results'))+1, len(after_caching.json.get('results')))
+
+    def add_more_gene(self):
+        more_gene = {
+            "results": [
+                {
+                    "species": "abc def",
+                    "ensembl_stable_id": "ENSAP7777777777777",
+                    "gene_name": "gene xxx",
+                    "location": "MVNR77777777.7:777777-777777"
+                }
+            ]
+        }
+        self._helper_add_genes(more_gene)
 
     def _get_genes_limit_and_start(self, keyword, limit, start):
         return self.app.test_client().get(url_for('genes.genesresource', lookup=keyword, start=start, limit=limit))
@@ -184,8 +222,8 @@ class GeneScenariosSearchCase(unittest.TestCase):
     def _get_genes(self, gene_name_lookup):
         return self.app.test_client().get(url_for('genes.genesresource', lookup=gene_name_lookup))
 
-    def _helper_add_genes(self):
-        for item in self.data.get('results'):
+    def _helper_add_genes(self, data):
+        for item in data.get('results'):
             gene = Gene(item['ensembl_stable_id'],
                         item['species'],
                         item['gene_name'],

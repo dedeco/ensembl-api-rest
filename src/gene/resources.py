@@ -3,10 +3,10 @@ from http import HTTPStatus
 from flask import url_for
 from flask_restful import Api, Resource, reqparse
 
-from src import db
+from src import db, cache
 from src.gene.models import Gene
 from src.gene.schema import GeneSchema
-from src.gene.utils import get_paginated_list, get_parameters_url, get_parsed_parameters
+from src.gene.utils import get_paginated_list, get_parameters_url, get_parsed_parameters, make_cache_key
 from . import gene_blueprint
 
 gene_restfull = Api(gene_blueprint)
@@ -14,7 +14,9 @@ gene_restfull = Api(gene_blueprint)
 
 class GenesResource(Resource):
 
+    @cache.cached(key_prefix=make_cache_key)
     def get(self):
+
         args = get_parsed_parameters(reqparse.RequestParser())
 
         q = db.session.query(Gene) \

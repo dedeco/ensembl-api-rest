@@ -4,8 +4,10 @@ from sentry_sdk.integrations.flask import FlaskIntegration
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
+from flask_caching import Cache
 
 db = SQLAlchemy()
+cache = Cache()
 
 
 def create_app(config_filename=None):
@@ -26,6 +28,8 @@ def initialize_extensions(app):
         dsn=app.config['SENTRY_URL'],
         integrations=[FlaskIntegration()]
     )
+    cache.init_app(app, config={'CACHE_TYPE': 'simple',
+                                'CACHE_DEFAULT_TIMEOUT': app.config['TIMEOUT_CACHE']})
 
 
 import src.gene

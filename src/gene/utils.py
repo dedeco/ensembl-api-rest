@@ -1,4 +1,11 @@
+from flask import request
 from marshmallow import ValidationError
+
+
+def make_cache_key(*args, **kwargs):
+    path = request.path
+    args = str(hash(frozenset(request.args.items())))
+    return (path + args).encode('utf-8')
 
 
 def min_length(length):
