@@ -1,7 +1,7 @@
 # Ensembl Api for search genes
 
 [![CircleCI](https://circleci.com/gh/dedeco/ensembl-api-rest/tree/master.svg?style=svg&circle-token=f06a27f1b3efc3d1b4cfeb23de4cec57ea5222dc)](https://circleci.com/gh/dedeco/ensembl-api-rest/tree/master)
-
+## Run api local
 The putative “Ensembl Services Platform” allows users to search for a gene by its name. One web REST service
 is available on this platform to get all gene names corresponding to a pattern.
 
@@ -65,3 +65,35 @@ is available on this platform to get all gene names corresponding to a pattern.
         ]
     }
    ```
+
+## Continuous Delivery (Circle Ci and Heroku)
+
+1.  When we push on master will trigger the pipeline on Circle Ci as following:
+
+- Security check
+- Build (using a gpg to decrypt the private key)
+- Tests
+- Deploy on Heroku
+
+On file .circleci/config.yml the workflow/jobs to build-test-deploy.
+
+Here a workflow example after running:
+
+![Workflow](tmp/screenshot-circleci-job-workflow.png)
+
+Here a specif example of tests passed on job tests:
+
+![Workflow](tmp/screenshot-circleci-job-tests.png)
+
+
+2. If pipeline runs with successful, all tests passed, the app will be deploy on Heroku.
+
+It can be found on: https://ensembl-api-rest-app.herokuapp.com/api/v1/genes
+
+Here an example requesting using Postman:
+
+![Workflow](tmp/screenshot-postman-search-by-gene.png)
+
+
+
+  
