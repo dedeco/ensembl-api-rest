@@ -1,6 +1,6 @@
 # Ensembl Api for search genes
 
-[![CircleCI](https://circleci.com/gh/dedeco/ensembl-api-rest/tree/master.svg?style=svg)](https://circleci.com/gh/dedeco/ensembl-api-rest/tree/master)
+[![CircleCI](https://circleci.com/gh/dedeco/ensembl-api-rest/tree/master.svg?style=svg&circle-token=f06a27f1b3efc3d1b4cfeb23de4cec57ea5222dc)](https://circleci.com/gh/dedeco/ensembl-api-rest/tree/master)
 
 The putative “Ensembl Services Platform” allows users to search for a gene by its name. One web REST service
 is available on this platform to get all gene names corresponding to a pattern.
