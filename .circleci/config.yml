@@ -31,7 +31,7 @@ jobs:
           command: |
             git clone https://github.com/StackExchange/blackbox.git
             cd blackbox && sudo make symlinks-install && cd ..
-            echo -e "$PR_KEY" | gpg --import --no-tty --batch --yes 
+            echo -e "$PR_KEY" | gpg --import --no-tty --batch --yes
             blackbox_postdeploy
       - run:
           name: install dependencies
