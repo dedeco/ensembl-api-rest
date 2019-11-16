@@ -2,7 +2,6 @@ version: 2
 jobs:
 
   security-checks:
-    working_directory: ~/repo
     docker:
       - image: docker:stable
     steps:
@@ -14,7 +13,6 @@ jobs:
           path: /tmp/artifacts/hawkeye_report.json
 
   build:
-    working_directory: ~/repo
     docker:
       - image: circleci/python:3.7
     environment:
@@ -24,19 +22,21 @@ jobs:
       - checkout
       - run: sudo chown -R circleci:circleci /usr/local/bin
       - run: sudo chown -R circleci:circleci /usr/local/lib/python3.7/site-packages
-      - restore_cache:
-          key: v1-dependencies-{{ checksum "Pipfile.lock" }}
+      - restore_cache:  # ensure this step occurs *before* installing dependencies
+          key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
       - run:
           name: Installing xmlsec library
           command: | #Installing xmlsec library
             sudo apt-get update
-            sudo apt-get install libxml2-dev libxmlsec1-dev libxmlsec1-openssl
+            sudo apt-get install libxml2-dev libxmlsec1-dev libxmlsec1-openssl gnupg
       - run:
           name: Running blackbox
           command: |
             git clone https://github.com/StackExchange/blackbox.git
             cd blackbox && sudo make symlinks-install && cd ..
-            echo -e "$GPG_KEY_CI" | gpg --import --no-tty --batch --yes
+            echo "Importing key"
+            echo -e "$GPG_KEY_CI" | gpg --import
+            sudo chmod o+rw $(tty)
             blackbox_postdeploy
       - run:
           name: install dependencies
@@ -44,12 +44,13 @@ jobs:
             sudo pip install pipenv
             pipenv install --dev
       - save_cache:
-          paths:
-            - ./venv
-          key: v1-dependencies-{{ checksum "Pipfile.lock" }}
+                key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+                paths:
+                  - ".venv"
+                  - "/usr/local/bin"
+                  - "/usr/local/lib/python3.7/site-packages"
 
   test:
-    working_directory: ~/repo
     docker:
       - image: circleci/python:3.7
     environment:
@@ -73,11 +74,15 @@ jobs:
       - run:
           name: run tests
           command: |
-            mkdir ~/repo/test-reports
-            pipenv run pytest -v --junitxml=~/repo/test-reports/junit.xml
+            mkdir ~/test-reports
+            pipenv run pytest -v --junitxml=~/test-reports/junit.xml
+      - store_test_results:
+          path: test-results
+      - store_artifacts:
+          path: test-results
+          destination: tr1
 
   deploy:
-    working_directory: ~/repo
     docker:
       - image: buildpack-deps:trusty
     steps:
