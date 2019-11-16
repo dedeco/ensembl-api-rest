@@ -36,7 +36,7 @@ jobs:
             cd blackbox && sudo make symlinks-install && cd ..
             echo "Importing key"
             echo -e "$GPG_KEY_CI" | gpg --import
-            blackbox_decrypt_all_files
+            blackbox_postdeploy
       - run:
           name: install dependencies
           command: |
