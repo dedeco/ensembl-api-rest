@@ -47,6 +47,19 @@ jobs:
       - checkout
       - run: sudo chown -R circleci:circleci /usr/local/bin
       - run: sudo chown -R circleci:circleci /usr/local/lib/python3.7/site-packages
+      - run:
+          name: Installing xmlsec library
+          command: | #Installing xmlsec library
+            sudo apt-get update
+            sudo apt-get install libxml2-dev libxmlsec1-dev libxmlsec1-openssl
+      - run:
+          name: Running blackbox
+          command: |
+            git clone https://github.com/StackExchange/blackbox.git
+            cd blackbox && sudo make symlinks-install && cd ..
+            echo "$PR_KEY" | base64 -d > pr.key
+            gpg --import pr.key
+            blackbox_postdeploy
       - restore_cache:
           key: v1-dependencies-{{ checksum "Pipfile.lock" }}
       - run:
