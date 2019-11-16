@@ -1,12 +1,12 @@
 # Ensembl Api for search genes
 
-[![CircleCI](https://circleci.com/gh/dedeco/ensembl-api-rest.svg?style=svg)](https://circleci.com/gh/dedeco/ensembl-api-rest)
+[![CircleCI](https://circleci.com/gh/dedeco/ensembl-api-rest/tree/master.svg?style=svg)](https://circleci.com/gh/dedeco/ensembl-api-rest/tree/master)
 
 The putative “Ensembl Services Platform” allows users to search for a gene by its name. One web REST service
 is available on this platform to get all gene names corresponding to a pattern.
 
 1.  How do I get set up this api? Install python +3.7 and create a virtualenv using pipenv:
-    [See here how to](https://github.com/pypa/pipenv)
+    [See here how to](https://github.com/pypa/pipenv).
 
 2.  Create and running a virtualenv
     ```
