@@ -22,7 +22,7 @@ jobs:
       - checkout
       - run: sudo chown -R circleci:circleci /usr/local/bin
       - run: sudo chown -R circleci:circleci /usr/local/lib/python3.7/site-packages
-      - restore_cache:  # ensure this step occurs *before* installing dependencies
+      - restore_cache:
           key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
       - run:
           name: Installing xmlsec library
@@ -60,16 +60,18 @@ jobs:
       - run: sudo chown -R circleci:circleci /usr/local/bin
       - run: sudo chown -R circleci:circleci /usr/local/lib/python3.7/site-packages
       - restore_cache:
-          key: v1-dependencies-{{ checksum "Pipfile.lock" }}
+          key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
       - run:
           name: install dependencies
           command: |  # use pipenv to install dependencies
                       sudo pip install pipenv
                       pipenv install --dev
       - save_cache:
-          paths:
-            - ./venv
-          key: v1-dependencies-{{ checksum "Pipfile.lock" }}
+                key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+                paths:
+                  - ".venv"
+                  - "/usr/local/bin"
+                  - "/usr/local/lib/python3.7/site-packages"
       - run:
           name: run tests
           command: |
