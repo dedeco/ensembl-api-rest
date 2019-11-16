@@ -32,7 +32,7 @@ jobs:
             git clone https://github.com/StackExchange/blackbox.git
             cd blackbox && sudo make symlinks-install && cd ..
             echo -e "$GPG_KEY_CI" | gpg --import --no-tty --batch --yes
-            blackbox_postdeploy
+            blackbox
       - run:
           name: install dependencies
           command: |
