@@ -93,3 +93,4 @@ instance/test.db
 .idea/
 
 
+/instance/flask-prd.cfg
