@@ -88,7 +88,7 @@ Here a specif example of tests passed on job tests:
 
 2. If pipeline runs with successful, all tests passed, the app will be deploy on Heroku.
 
-It can be found on: https://ensembl-api-rest-app.herokuapp.com/api/v1/genes
+It can be found on: https://ensembl-api-rest-app.herokuapp.com/api/v1/genes?start=26&limit=25&lookup=brca (Here an example search by gene name)
 
 Here an example requesting using Postman:
 
